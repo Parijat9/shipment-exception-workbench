@@ -1,0 +1,10 @@
+{
+  "idempotency_key": "870f3b42367bc743c3e4c70d",
+  "shipment_id": "S000001",
+  "title": "Review S000001: weather",
+  "priority": "normal",
+  "owner_role": "dispatch",
+  "due_at": "2026-09-30T13:00:00+00:00",
+  "category": "weather",
+  "late_minutes": 0
+}

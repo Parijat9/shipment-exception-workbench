@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "idempotency_key": {
+      "type": "string"
+    },
+    "shipment_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "high",
+        "normal"
+      ]
+    },
+    "owner_role": {
+      "type": "string",
+      "enum": [
+        "dispatch",
+        "carrier_management",
+        "customer_operations",
+        "billing",
+        "operations_review"
+      ]
+    },
+    "due_at": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "late_minutes": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "idempotency_key",
+    "shipment_id",
+    "title",
+    "priority",
+    "owner_role",
+    "due_at",
+    "category",
+    "late_minutes"
+  ]
+}

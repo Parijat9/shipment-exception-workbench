@@ -1,0 +1,10 @@
+{
+  "events": 80,
+  "unique_tasks": 80,
+  "sent_simulated": 27,
+  "awaiting_review": 53,
+  "holdout_accuracy": 0.7894736842105263,
+  "holdout_coverage": 0.5263157894736842,
+  "live_ai_tested": false,
+  "live_integrations_tested": false
+}

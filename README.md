@@ -1,15 +1,24 @@
-# Shipment exception workbench
+# Shipment issue tracker
 
-Carrier updates are often short, inconsistent and difficult to turn into accountable
-follow-up. This project converts a shipment event into a reviewable task with a reason,
-owner role, SLA deadline and audit trail. It includes a keyword baseline and an optional
-structured-output model adapter so the two approaches can be evaluated separately.
+Turns short shipment updates into tasks that someone can review and follow up on.
 
-![Exception review](docs/preview.png)
+A note such as “arrival delayed by 150 minutes” needs a clear next step. This project gives the task a reason, a priority, an owner role and a response deadline.
 
-## Run it
+![Shipment tasks ready for review](docs/preview.png)
 
-Python 3.10 or newer. The default run is offline and requires no packages or credentials.
+[Open the sample report](https://parijat9.github.io/reports/exceptions.html)
+
+## What it does
+
+- Reads a shipment note and looks for a known issue.
+- Sets the priority and response time using fixed business rules.
+- Leaves unclear notes for a person to review.
+- Stops repeat updates from creating duplicate tasks.
+- Tracks approvals, failed sends and tasks that need another check.
+
+## Try it
+
+Python 3.10 or newer is enough for the default example. It runs locally without accounts or extra packages.
 
 ```bash
 python -m unittest discover -s tests -v
@@ -17,61 +26,32 @@ python run.py
 python evaluate.py
 ```
 
-Open `build/index.html`. Inspect `build/tasks.json` and
-`build/evaluation-baseline.json` for the underlying evidence. A downloadable
-[sample report](sample/index.html) is also included.
+Open `build/index.html` in your browser. The files in `build/` also contain the task list and test results.
 
-## Observed results
+## How it works
 
-The demonstration receives 80 events twice, retains 80 unique tasks, sends 27 through
-a simulated dispatcher and leaves 53 awaiting review. Each simulated approved task
-first encounters a retryable failure. A successful delivery is not repeated.
+1. Receive a shipment update.
+2. Check the note and suggest the issue type.
+3. Assign the owner role and response deadline.
+4. Ask a person to approve the task.
+5. Record whether the task was sent successfully.
 
-On 19 held-out synthetic notes, the keyword baseline has 78.9% overall accuracy and
-52.6% coverage. Its answered classifications are correct in this small set; four
-synonym cases are missed. The complete failures are retained in the evaluation file.
-This is a small authored fixture, not an independent production benchmark.
+If a send times out, the task is set aside for checking. Sending it again without checking could create duplicate work.
 
-## Where AI fits
+## What the example shows
 
-The model only proposes a reason and a short verbatim evidence excerpt. Application
-code assigns the owner and deadline. Schema checks reject extra fields and evidence
-that does not appear in the note. These checks do not establish semantic correctness,
-so human review remains required.
+The demo sends the same 80 updates through the process twice. It keeps 80 tasks, completes 27 simulated sends and leaves 53 tasks awaiting review. These are practice records; the demo does not send tasks to a real team.
 
-To evaluate the optional OpenAI adapter, set `OPENAI_API_KEY` and `OPENAI_MODEL` in
-your shell, then run `python evaluate.py --live`. This makes paid API calls for the
-synthetic evaluation notes. Credentials are never stored in the repository.
-The live adapter is contract-tested with mocked responses; live model scores have
-not been measured. Model errors are recorded as errors, not silently counted as
-successful baseline predictions.
+There is also a set of 19 sample notes. The simple keyword method answers 10 of them correctly. It leaves the rest for review, including four notes whose wording it misses. These cases are kept in the results so the limits are easy to see.
 
-```mermaid
-flowchart LR
-  E[Shipment event] --> C[Reason and evidence]
-  C --> V[Validate proposal]
-  V --> P[Code-owned SLA and role]
-  P --> R[Human review]
-  R --> O[Approved outbox]
-  O --> D[Downstream task workflow]
-  D --> A[Delivery audit]
-```
+## Optional note-reading service
 
-## Reliability choices
+The project can also ask an OpenAI model to suggest an issue type and quote the words that support it. A person still reviews the result. This option is not required for the demo.
 
-- Stable event keys prevent duplicate tasks on replay.
-- Conflicting replays fail instead of overwriting a reviewed task.
-- Unapproved tasks cannot reach the dispatcher.
-- Known pre-send failures have bounded retries.
-- Timeouts and unknown delivery outcomes enter reconciliation, not blind retries.
-- A crash after claiming a task leaves it in `sending` for operator investigation.
+To try it, set `OPENAI_API_KEY` and `OPENAI_MODEL` in your shell and run `python evaluate.py --live`. This uses paid API calls. Live results have not been measured; the connection code has been tested with sample responses.
 
-See [workflow operations](docs/operations.md), [integration contracts](integrations/README.md),
-[evaluation fixtures](fixtures/evaluation.json) and [development workflow](docs/development.md).
+## Connecting other tools
 
-## Scope
+[Power Automate and Zoho Projects notes](integrations/README.md) explain the fields and steps needed to connect the workflow. They are setup instructions, not a working connection to a company account.
 
-The local workflow and simulation are executable. Power Automate and Zoho Projects
-are supplied as field mappings, payload contracts and a deployment procedure.
-They have not been connected to a live tenant. This is a single-worker SQLite
-demonstrator, not a multi-tenant task service. It contains no employer data or code.
+[Task commands and troubleshooting](docs/operations.md) explain how to add, approve and check tasks.

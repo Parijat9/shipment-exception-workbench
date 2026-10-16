@@ -85,22 +85,22 @@ def run(out):
     ]
     categories = sorted({t["category"] for t in tasks})
     chart = comparison_chart(
-        "Reason classification",
+        "Issues by type",
         categories,
         [("Tasks", [sum(t["category"] == c for t in tasks) for c in categories])],
     )
     render(
         out / "index.html",
-        "Shipment exception workbench",
-        "Carrier notes become reviewable tasks with traceable evidence, SLA deadlines and replay protection.",
+        "Shipment issue tracker",
+        "Turn shipment updates into tasks with an owner and a deadline, without creating duplicates.",
         {
-            "Incoming events": 80,
+            "Shipment updates": 80,
             "Unique tasks": len(rows),
             "Simulated sends": metrics["sent_simulated"],
             "Awaiting review": metrics["awaiting_review"],
         },
         views,
-        f"The keyword baseline scored {evaluation['accuracy']:.1%} on {evaluation['cases']} held-out synthetic notes. Synonyms account for the missed classifications. Optional model evaluation is separate and has not been run. All deadlines and owner roles are computed by policy. Every task requires review before dispatch.",
+        f"Keyword matching made the right decision for {evaluation['accuracy']:.1%} of {evaluation['cases']} sample notes. It missed some notes that used different words for the same issue. The optional language-model service has not been tested live. Rules set each task's owner and deadline. A person reviews every task before it is sent.",
         chart=chart,
     )
     box.close()
